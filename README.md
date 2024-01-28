@@ -12,4 +12,4 @@ A Social Media ADT that can handle features related to posts, comments and repli
 - running `man` will list all the functions that are present in the code.
 - `exit` will exit the program.
 
-<img width="987" alt="Demo" src="https://github.com/pingu-73/social_media/assets/121669947/071d7386-e49b-461a-9463-219e47e3d1e4">
+<img width="600" alt="Demo" src="https://github.com/pingu-73/social_media/assets/121669947/071d7386-e49b-461a-9463-219e47e3d1e4">
