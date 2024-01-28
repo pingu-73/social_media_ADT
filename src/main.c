@@ -6,7 +6,7 @@ int main() {
     char command[20], arg1[100], arg2[100];
 
     while (1) {
-        printf("Enter a command: ");
+        printf(BLACK_BOLD("Enter a command: "));
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
 
