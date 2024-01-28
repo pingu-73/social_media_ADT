@@ -3,131 +3,174 @@
 int main() {
     Platform platform = NULL;
     char input[100];
+    char command[20], arg1[100], arg2[100];
+
     while (1) {
-        printf("Enter a command: ");
+        printf(BLACK_BOLD("Enter a command: "));
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
 
-        if (strcmp(input, "create_platform") == 0) {
-            if (platform == NULL) {
+        sscanf(input, "%s %s %s", command, arg1, arg2);
+
+        if (strcmp(command, "create_platform") == 0) {
+            if (platform == NULL)
+            {
                 platform = createPlatform();
-                if (platform != NULL) {
-                    printf("Platform created successfully.\n");
-                } else {
-                    printf("Failed to create platform.\n");
+                if (platform != NULL)
+                {
+                    printf(GREEN("Platform created successfully.\n"));
+                } 
+                else
+                {
+                    printf(RED_BOLD("Failed to create platform.\n"));
                 }
-            } else {
-                printf("Platform already exists.\n");
+            } 
+            else
+            {
+                printf(YELLOW("Platform already exists.\n"));
             }
         }
 
-        else if (strcmp(input, "add_post") == 0) {
-            char username[100], content[100];
-            printf("Enter your username: ");
-            fgets(username, sizeof(username), stdin);
-            username[strcspn(username, "\n")] = '\0';
-            printf("Enter content for post: ");
-            fgets(content, sizeof(content), stdin);
-            content[strcspn(content, "\n")] = '\0';
-            addPost(platform, username, content);
+        else if (strcmp(command, "add_post") == 0)
+        {
+            if (strlen(arg1) == 0 || strlen(arg2) == 0)
+            {
+                printf(RED("Invalid arguments.\n"));
+                continue;
+            }
+            addPost(platform, arg1, arg2);
         }
 
-        else if (strcmp(input, "delete_post") == 0) {
-            int n;
-            printf("Enter the post number to delete: ");
-            scanf("%d", &n);
-            getchar();
+        else if (strcmp(command, "delete_post") == 0)
+        {
+            if (strlen(arg1) == 0)
+            {
+                printf(RED("Invalid arguments.\n"));
+                continue;
+            }
+            int n = atoi(arg1);
             deletePost(&platform, n);
         }
         
-        else if (strcmp(input, "view_post") == 0) {
-            int n;
-            printf("Enter the post number to view: ");
-            scanf("%d", &n);
-            getchar();
-            Post v = viewPost(platform, n);
-            if (v != NULL) {
-                printf("User: %s, Caption: %s\n", v->Username, v->Caption);
-            } else {
-                printf("Post not found.\n");
+        else if (strcmp(command, "view_post") == 0)
+        {
+            int post_number = atoi(arg1);
+            Post v = viewPost(platform, post_number);
+            if (v != NULL)
+            {
+                printf(GREEN("User: %s, \t Caption: %s\n"), v->Username, v->Caption);
+            }
+            else
+            {
+                printf(RED("Post not found.\n"));
             }
         }
-        
-        else if (strcmp(input, "add_comment") == 0) {
-            if (platform == NULL || platform->lastViewedPost == NULL) {
-                printf("No post has been viewed yet. Unable to add comment.\n");
-            } else {
+
+        else if (strcmp(command, "current_post") == 0) 
+        {
+            Post currentPost = currPost(platform);
+            if (currentPost != NULL)
+            {
+                printf(GREEN("Current Post: User: %s, \t Caption: %s\n"), currentPost->Username, currentPost->Caption);
+            } 
+            else
+            {
+                printf(YELLOW("No post currently viewed.\n"));
+            }
+        }
+
+        else if (strcmp(command, "previous_post") == 0)
+        {
+            Post previous = previousPost(platform);
+            if (previous != NULL)
+            {
+                printf(GREEN("Previous Post: User: %s, \t Caption: %s\n"), previous->Username, previous->Caption);
+            } 
+            else
+            {
+                printf(RED("No previous post available.\n"));
+            }
+        }
+
+        else if (strcmp(command, "next_post") == 0) 
+        {
+            Post next = nextPost(platform);
+            if (next != NULL)
+            {
+                printf(GREEN("Next Post: User: %s, \t Caption: %s\n"), next->Username, next->Caption);
+            } 
+            else
+            {
+                printf(RED("No next post available.\n"));
+            }
+        }
+
+        else if (strcmp(command, "add_comment") == 0) 
+        {
+            if (platform == NULL || platform->lastViewedPost == NULL) 
+            {
+                printf(YELLOW("No post has been viewed yet. Unable to add comment.\n"));
+            } 
+            else 
+            {
                 char username[100], content[100];
-                printf("Enter your username: ");
-                fgets(username, sizeof(username), stdin);
-                username[strcspn(username, "\n")] = '\0';
-                printf("Enter content for comment: ");
-                fgets(content, sizeof(content), stdin);
-                content[strcspn(content, "\n")] = '\0';
+                sscanf(input, "%*s %s %[^\n]", username, content);
                 addComment(platform, username, content);
             }
         }
 
-        else if (strcmp(input, "delete_comment") == 0) {
+        else if (strcmp(command, "view_comments") == 0) 
+        {
+            Comment comments = viewComments(platform);
+            if (comments != NULL) 
+            {
+                printf(GREEN("Comments:\n"));
+                while (comments != NULL) {
+                    printf(GREEN("User: %s, Content: %s\n"), comments->Username, comments->Caption);
+                    comments = comments->nxtPost;
+                }
+            } 
+            else 
+            {
+                printf(YELLOW("No comments available.\n"));
+            }
+        }
+
+        else if (strcmp(command, "delete_comment") == 0) {
             if (platform == NULL || platform->lastViewedPost == NULL) {
                 printf("No post has been viewed yet. Unable to delete comment.\n");
-            } else {
-                int n;
-                printf("Enter the comment number to delete: ");
-                scanf("%d", &n);
-                getchar();
+            } 
+            else {
+                int n = atoi(arg1);
                 deleteComment(platform, n);
             }
         }
 
-        else if (strcmp(input, "view_comments") == 0) {
-            Comment comments = viewComments(platform);
-            if (comments != NULL) {
-                printf("Comments:\n");
-                while (comments != NULL) {
-                    printf("User: %s, Content: %s\n", comments->Username, comments->Caption);
-                    comments = comments->nxtPost;
-                }
-            } else {
-                printf("No comments available.\n");
-            }
-        } 
-
-        else if (strcmp(input, "current_post") == 0){
-            Post currentPost = currPost(platform);
-            if (currentPost != NULL) {
-                printf("Current Post: User: %s, Caption: %s\n", currentPost->Username, currentPost->Caption);
-            } else {
-                printf("No post currently viewed.\n");
-            }
+        else if (strcmp(command, "man") == 0) 
+        {
+            printf(YELLOW("\n//=============================== Mannual ============================================//\n"
+                "[create_platform] \t \t \t- creates an instance of social media platform.\n"
+                "[add_post <user_name> <caption>] \t- upload a post by <username> with <contents>.\n"
+                "[delete_post <post_no.>] \t \t- deletes <post_no.>th recent post.\n"
+                "[view_post <post_no.>] \t \t \t- lists nth recent post along with it's content.\n"
+                "[view_comments] \t \t \t- lists all the comments.\n"
+                "[add_comment <user_name> <content>] \t- post comment to last viewed post.\n"
+                "[delete_comment]\n"
+                "[view_comment]\n"
+                "[current/previous/next_post]\n"
+                "//======================================================================================//\n")
+            );
         }
 
-        else if (strcmp(input, "previous_post") == 0){
-            Post previous = previousPost(platform);
-            if (previous != NULL) {
-                printf("Previous Post: User: %s, Caption: %s\n", previous->Username, previous->Caption);
-            } else {
-                printf("No previous post available.\n");
-            }
-        }
-
-        else if (strcmp(input, "next_post") == 0) {
-            Post next = nextPost(platform);
-            if (next != NULL) {
-                printf("Next Post: User: %s, Caption: %s\n", next->Username, next->Caption);
-            } else {
-                printf("No next post available.\n");
-            }
-        }
-
-        else if (strcmp(input, "exit") == 0) {
+        else if (strcmp(command, "exit") == 0)
+        {
             free(platform);
-            printf("******************** thank you *******************\n");
+            printf(GREEN_BOLD("******************** thank you *******************\n"));
             return 0;
         }
 
         else {
-            printf("Unknown command.\n");
+            printf(RED_BOLD("------------------ Unknown command -------------\n"));
         }
     }
 }
