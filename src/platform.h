@@ -1,34 +1,31 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
 #include <stdbool.h>
+#include <string.h>
+
 #include "post.h"
 #include "comment.h"
-#include "reply.h"
-
-extern Post globalLastViewedPost;
 
 typedef struct Platform *Platform;
-struct Platform 
-{
+
+struct Platform {
     Post posts;
+    Post lastViewedPost;
 };
 
+Platform createPlatform();
+bool addPost(Platform platform, char *username, char *caption);
+bool deletePost(Platform *platform, int n);
+Post viewPost(Platform platform, int n);
+Post currPost(Platform platform);
+Post nextPost(Platform platform);
+Post previousPost(Platform platform);
+Comment viewComments(Platform platform);
+bool deleteComment(Platform platform, int n);
+bool addComment(Platform platform, char *username, char *content);
 
-Platform* createPlatform();
-void addPost(str username, Sentence caption);
-void deletePost(int n);
-Post viewPost(int n);
-Post currPost();
-Post nextPost();
-Post previousPost();
-bool addComment(str username, Sentence content);
-bool deleteComment(int n);
-Comment viewComment();
-
-bool addReply(str username, Sentence content, int n); // n adds reply to nth recent comment on last viewed post
-bool deleteReply(int n, int m);
-
-// void viewLastPost(Platform *platform);
-
-#endif
+#endif 
