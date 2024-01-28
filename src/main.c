@@ -6,11 +6,33 @@ int main() {
     char command[20], arg1[100], arg2[100];
 
     while (1) {
-        printf(BLACK_BOLD("Enter a command: "));
+        printf("Enter a command: ");
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = '\0';
 
-        sscanf(input, "%s %s %s", command, arg1, arg2);
+        sscanf(input, "%s", command);
+
+        char *arg_start = strchr(input, ' ');
+        if (arg_start != NULL)
+        {
+            char *arg_end = strchr(arg_start + 1, ' ');
+            if (arg_end != NULL)
+            {
+                strncpy(arg1, arg_start + 1, arg_end - arg_start - 1);
+                arg1[arg_end - arg_start - 1] = '\0';
+                strcpy(arg2, arg_end + 1);
+            } 
+            else 
+            {
+                strcpy(arg1, arg_start + 1);
+                arg2[0] = '\0';
+            }
+        } 
+        else 
+        {
+            arg1[0] = '\0';
+            arg2[0] = '\0';
+        }
 
         if (strcmp(command, "create_platform") == 0) {
             if (platform == NULL)
